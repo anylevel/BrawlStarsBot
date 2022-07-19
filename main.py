@@ -1,6 +1,6 @@
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import Bot, Dispatcher, types
 from aiohttp import ClientSession
-import aiosqlite
+from app.database import create_table
 import asyncio
 import os
 
@@ -12,18 +12,6 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot=bot)
 
 app_storage = {}
-
-
-@dp.message_handler(commands=["start", "help"])
-async def get_token(message: types.Message):
-    await message.answer(f"kek_bek:{message.from_user.username}")
-
-
-async def create_table() -> None:
-    async with aiosqlite.connect("stats.db") as db:
-        await db.execute(
-            '''CREATE TABLE IF NOT EXISTS users (id integer primary key , user_name text , game_hashtag text)''')
-        await db.commit()
 
 
 async def main():
