@@ -6,3 +6,4 @@ async def create_table() -> None:
         await db.execute(
             '''CREATE TABLE IF NOT EXISTS users (id integer primary key , user_name text , game_hashtag text)''')
         await db.commit()
+
