@@ -2,9 +2,9 @@ from aiogram import Bot, Dispatcher
 from aiohttp import ClientSession
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from app.database import create_table, init
+import aiofiles
 import asyncio
 import os
-from tortoise import run_async
 
 BOT_TOKEN = os.getenv("API_TOKEN")
 if not BOT_TOKEN:
@@ -17,7 +17,14 @@ app_storage = {}
 
 
 async def main():
-    app_storage["session"] = ClientSession()
+    async with aiofiles.open("./config.txt", 'r') as file:
+        data = await file.read()
+    token = data.rstrip()
+    headers = {
+        "Accept": "application/json",
+        "authorization": f"Bearer {token}"
+    }
+    app_storage["session"] = ClientSession(headers=headers)
     async with app_storage["session"]:
         await create_table()
         await init()
