@@ -1,9 +1,15 @@
 import aiosqlite
+from tortoise import Tortoise
 
 
 async def create_table() -> None:
-    async with aiosqlite.connect("stats.db") as db:
-        await db.execute(
-            '''CREATE TABLE IF NOT EXISTS users (id integer primary key , user_name text , game_hashtag text)''')
-        await db.commit()
+    async with aiosqlite.connect("stats.db"):
+        pass
 
+
+async def init():
+    await Tortoise.init(
+        db_url="sqlite://stats.db",
+        modules={"models": ["app.models"]}
+    )
+    await Tortoise.generate_schemas()
