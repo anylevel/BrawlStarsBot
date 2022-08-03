@@ -2,6 +2,7 @@ from aiogram import Bot, Dispatcher
 from aiohttp import ClientSession
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from app.database import create_table, init
+from app.middlewares import ThrottlingMiddleware
 import aiofiles
 import asyncio
 import os
@@ -28,7 +29,9 @@ async def main():
     async with app_storage["session"]:
         await create_table()
         await init()
-        from app.handlers import dp
+        from app.handlers import dp , SomeMiddleware
+        dp.middleware.setup(ThrottlingMiddleware())
+        dp.middleware.setup(SomeMiddleware())
         await dp.start_polling()
 
 
