@@ -3,7 +3,7 @@ from aiogram.dispatcher import DEFAULT_RATE_LIMIT
 from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
-from aiogram import types , Dispatcher
+from aiogram import types, Dispatcher
 
 
 def rate_limit(limit: int, key=None):
@@ -21,6 +21,7 @@ def rate_limit(limit: int, key=None):
         return func
 
     return decorator
+
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -90,4 +91,6 @@ class ThrottlingMiddleware(BaseMiddleware):
         # If current message is not last with current key - do not send message
         if thr.exceeded_count == throttled.exceeded_count:
             await message.reply('Unlocked.')
+
+
 
