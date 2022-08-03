@@ -1,11 +1,9 @@
 from app.models import User
 from aiogram import types
 from main import dp, app_storage
-from app.middlewares import some
 
 
 @dp.message_handler(commands=["player_info"])
-@some()
 async def get_player_info(message: types.Message):
     token = await get_token(message=message)
     url = f"https://api.brawlstars.com/v1/players/%23{token}/"

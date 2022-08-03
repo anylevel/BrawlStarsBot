@@ -2,8 +2,8 @@ from main import dp
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from ..models import User
-from ..middlewares import rate_limit
+from app.models import User
+from app.middlewares import rate_limit
 
 #TODO Написать валидатор для хештега, понять как доставать атрибуты из tortoise orm
 #TODO разобраться с middleware
