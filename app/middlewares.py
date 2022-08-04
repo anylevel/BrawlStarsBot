@@ -3,8 +3,15 @@ from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
 from aiogram import types, Dispatcher
+from .constans import commands
 
 
+class HandlerMiddleware(BaseMiddleware):
+    async def on_process_update(self, update: types.Update, data: dict):
+        name_handler = update.message.text
+        if name_handler not in commands:
+            print('kek')
+            raise CancelHandler()
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -29,7 +36,7 @@ class ThrottlingMiddleware(BaseMiddleware):
         dispatcher = Dispatcher.get_current()
         # If handler was configured, get rate limit and key from handler
         limit = self.rate_limit
-        key = f"{self.prefix}_message"
+        key = f"{self.prefix}_{handler.__name__}"
 
         # Use Dispatcher.throttle method.
         try:
@@ -48,8 +55,8 @@ class ThrottlingMiddleware(BaseMiddleware):
         :param throttled:
         """
         dispatcher = Dispatcher.get_current()
-
-        key = f"{self.prefix}_message"
+        handler = current_handler.get()
+        key = f"{self.prefix}_{handler.__name__}"
 
         # Calculate how many time is left till the block ends
         delta = throttled.rate - throttled.delta
@@ -67,6 +74,3 @@ class ThrottlingMiddleware(BaseMiddleware):
         # If current message is not last with current key - do not send message
         if thr.exceeded_count == throttled.exceeded_count:
             await message.reply('Unlocked.')
-
-
-
