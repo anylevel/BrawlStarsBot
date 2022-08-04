@@ -1,3 +1,3 @@
-from .handlers import dp, SomeMiddleware
+from .handlers import dp, TokenMiddleware
 
-__all__ = ["dp", "SomeMiddleware"]
+__all__ = ["dp", "TokenMiddleware"]
