@@ -3,7 +3,6 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.models import User
-from app.middlewares import rate_limit
 
 #TODO Написать валидатор для хештега, понять как доставать атрибуты из tortoise orm
 #TODO разобраться с middleware
@@ -14,7 +13,6 @@ class Token(StatesGroup):
 
 
 @dp.message_handler(commands=["start"], state="*")
-@rate_limit(5,'start')
 async def start(message: types.Message, state: FSMContext):
     user = await User.filter(name=message.from_user.username).first()
     if user:
