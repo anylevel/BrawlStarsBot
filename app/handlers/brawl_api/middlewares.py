@@ -2,7 +2,7 @@ from app.models import User
 from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram import types
-from pathlib import Path
+
 
 class TokenMiddleware(BaseMiddleware):
     def __init__(self):
