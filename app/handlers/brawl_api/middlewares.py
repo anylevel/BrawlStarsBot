@@ -4,10 +4,10 @@ from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram import types
 from pathlib import Path
 
-class SomeMiddleware(BaseMiddleware):
+class TokenMiddleware(BaseMiddleware):
     def __init__(self):
         self.flag = False
-        super(SomeMiddleware, self).__init__()
+        super(TokenMiddleware, self).__init__()
 
     async def on_pre_process_message(self, message: types.Message, data: dict):
         handler = current_handler.get()
