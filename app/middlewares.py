@@ -3,15 +3,19 @@ from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
 from aiogram import types, Dispatcher
-from .constans import commands
+from .constans import commands, states
 
 
 class HandlerMiddleware(BaseMiddleware):
-    async def on_process_update(self, update: types.Update, data: dict):
-        name_handler = update.message.text
-        if name_handler not in commands:
-            print('kek')
+    async def on_process_message(self, message: types.Message, data: dict):
+        if message.text in commands:
+            return
+        try:
+            if data["raw_state"] not in states:
+                raise CancelHandler()
+        except KeyError:
             raise CancelHandler()
+
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -35,8 +39,11 @@ class ThrottlingMiddleware(BaseMiddleware):
         # Get dispatcher from context
         dispatcher = Dispatcher.get_current()
         # If handler was configured, get rate limit and key from handler
-        limit = self.rate_limit
-        key = f"{self.prefix}_{handler.__name__}"
+        if handler:
+            limit = self.rate_limit
+            key = f"{self.prefix}_{handler.__name__}"
+        else:
+            key = f"{self.prefix}_message"
 
         # Use Dispatcher.throttle method.
         try:
