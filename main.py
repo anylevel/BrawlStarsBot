@@ -1,9 +1,10 @@
 from aiogram import Bot, Dispatcher
-from aiohttp import ClientSession
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiohttp import ClientSession
+from app.sessions import Sessions
 from app.database import create_table, init
 from app.middlewares import ThrottlingMiddleware, HandlerMiddleware
-import aiofiles
+from app.constans import get_token
 import asyncio
 import os
 
@@ -14,23 +15,17 @@ if not BOT_TOKEN:
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
-app_storage = {}
-
-
 
 async def main():
-    async with aiofiles.open("./config.txt", 'r') as file:
-        data = await file.read()
-    token = data.rstrip()
     headers = {
         "Accept": "application/json",
-        "authorization": f"Bearer {token}"
+        "authorization": f"Bearer {await get_token()}"
     }
-    app_storage["session"] = ClientSession(headers=headers)
-    async with app_storage["session"]:
+    async with ClientSession(headers=headers) as session:
+        from app.handlers import dp, TokenMiddleware
+        Sessions(session=session, name="brawl_api")
         await create_table()
         await init()
-        from app.handlers import dp, TokenMiddleware
         dp.middleware.setup(HandlerMiddleware())
         dp.middleware.setup(TokenMiddleware())
         dp.middleware.setup(ThrottlingMiddleware())
