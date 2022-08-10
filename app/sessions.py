@@ -1,10 +1,10 @@
 class Sessions:
-    items = []
+    items = {}
 
     def __init__(self, session, name):
         self.name = name
         self.session = session
-        Sessions.items.append(self)
+        Sessions.items[name] = session
 
     async def __aenter__(self):
         return self.session
@@ -15,7 +15,7 @@ class Sessions:
 
     @staticmethod
     def get_response(name, url):
-        for item in Sessions.items:
-            if item.name == name:
-                return item.session.get(url=url)
-        raise ValueError("Такой сессии не существует!")
+        try:
+            return Sessions.items[name].get(url=url)
+        except KeyError:
+            print("Такой сессии не существует!")
