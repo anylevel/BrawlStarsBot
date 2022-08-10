@@ -3,6 +3,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from app.models import User
+from app.handlers.brawl_api.utils import hashtag_check
 
 
 # TODO Написать валидатор для хештега
@@ -51,6 +52,10 @@ async def cancel(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=Token.waiting_for_get_token)
 async def finish_token(message: types.Message, state: FSMContext):
+    token, result = await hashtag_check(message.text)
+    if result is False:
+        await message.reply(f"Токен {token} является некорректным.Пример: 9QCG9QC8C или 9qcg9qc8c")
+        return
     user = await User.get_or_none(name=message.from_user.username)
     if user is None:
         await User.create(name=message.from_user.username, token=message.text)
