@@ -1,4 +1,6 @@
 from app.sessions import Sessions
+from app.models import User
+from aiogram import types
 
 session_name = "brawl_api"
 
@@ -11,3 +13,8 @@ async def hashtag_check(hashtag: str) -> tuple[str, bool]:
     if 'reason' in data:
         return hashtag, False
     return hashtag, True
+
+
+async def get_token(message: types.Message):
+    user = await User.get(name=message.from_user.username)
+    return user.token
