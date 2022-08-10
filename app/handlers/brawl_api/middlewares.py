@@ -16,7 +16,7 @@ class TokenMiddleware(BaseMiddleware):
             await self.check_token(message)
 
     async def check_token(self, message: types.Message):
-        user = await User.filter(name=message.from_user.username).first()
+        user = await User.get(name=message.from_user.username)
         if not user:
             await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
             raise CancelHandler()
