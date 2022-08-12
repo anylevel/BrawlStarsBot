@@ -15,7 +15,8 @@ class HandlerMiddleware(BaseMiddleware):
                 raise CancelHandler()
         except KeyError:
             raise CancelHandler()
-
+        finally:
+            await message.answer("Я понимаю только команды которые придумал мой создатель!")
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -43,6 +44,7 @@ class ThrottlingMiddleware(BaseMiddleware):
             limit = self.rate_limit
             key = f"{self.prefix}_{handler.__name__}"
         else:
+            limit = self.rate_limit
             key = f"{self.prefix}_message"
 
         # Use Dispatcher.throttle method.
@@ -50,30 +52,28 @@ class ThrottlingMiddleware(BaseMiddleware):
             await dispatcher.throttle(key, rate=limit)
         except Throttled as t:
             # Execute action
-            await self.message_throttled(message, t)
+            await self.message_throttled(message, t, key)
 
             # Cancel current handler
             raise CancelHandler()
 
-    async def message_throttled(self, message: types.Message, throttled: Throttled):
+    async def message_throttled(self, message: types.Message, throttled: Throttled, key: str):
         """
         Notify user only on first exceed and notify about unlocking only on last exceed
         :param message:
         :param throttled:
         """
         dispatcher = Dispatcher.get_current()
-        handler = current_handler.get()
-        key = f"{self.prefix}_{handler.__name__}"
 
         # Calculate how many time is left till the block ends
-        delta = throttled.rate - throttled.delta
+        #delta = throttled.rate - throttled.delta
 
         # Prevent flooding
         if throttled.exceeded_count <= 2:
             await message.reply('Too many requests! ')
 
         # Sleep.
-        await asyncio.sleep(delta)
+        await asyncio.sleep(30)
 
         # Check lock status
         thr = await dispatcher.check_key(key)
