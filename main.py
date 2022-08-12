@@ -7,7 +7,7 @@ from app.middlewares import ThrottlingMiddleware, HandlerMiddleware
 from app.constans import get_token_api, get_token_bot
 import asyncio
 
-bot = Bot(token=await get_token_bot())
+bot = Bot(token=get_token_bot())
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
 
@@ -21,9 +21,9 @@ async def main():
         Sessions(session=session, name="brawl_api")
         await create_table()
         await init()
-        dp.middleware.setup(HandlerMiddleware())
         dp.middleware.setup(TokenMiddleware())
         dp.middleware.setup(ThrottlingMiddleware())
+        dp.middleware.setup(HandlerMiddleware())
         await dp.start_polling()
 
 
