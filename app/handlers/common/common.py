@@ -133,8 +133,6 @@ async def finish_clan_token(message: types.Message, state: FSMContext):
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi8pi9uqPw9gi73z_7sZhjQoJ_J9yKAACiw8AAiRsuEkuUDkZ0De6TikE')
 
 
-# TODO команда для отдельного добавления токена клана
-
 @dp.message_handler(commands=['help'])
 async def information_about_project(message: types.Message):
     buttons = [
