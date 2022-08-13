@@ -3,7 +3,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiohttp import ClientSession
 from app.sessions import Sessions
 from app.database import create_table, init
-from app.middlewares import ThrottlingMiddleware, HandlerMiddleware
+from app.middlewares import *
 from app.constans import get_token_api, get_token_bot
 import asyncio
 
@@ -17,13 +17,15 @@ async def main():
         "authorization": f"Bearer {await get_token_api()}"
     }
     async with ClientSession(headers=headers) as session:
-        from app.handlers import dp, TokenMiddleware
+        from app import dp
         Sessions(session=session, name="brawl_api")
         await create_table()
         await init()
-        dp.middleware.setup(TokenMiddleware())
+
         dp.middleware.setup(ThrottlingMiddleware())
-        dp.middleware.setup(HandlerMiddleware())
+        #dp.middleware.setup(HandlerMiddleware())
+        dp.middleware.setup(TokenMiddleware())
+
         await dp.start_polling()
 
 
