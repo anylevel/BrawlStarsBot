@@ -1,5 +1,6 @@
+from aiogram.dispatcher.handler import CancelHandler
 from aiogram.types import ContentType
-
+from typing import Optional
 from main import dp
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -36,14 +37,18 @@ async def start(message: types.Message, state: FSMContext):
     await Token.waiting_for_get_token.set()
 
 
+async def check_user(user: Optional[User], message: types.Message):
+    if user is None:
+        await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
+        raise CancelHandler()
+
+
 @dp.message_handler(commands=["change"], state='*')
 async def change(message: types.Message, state: FSMContext):
     user = await User.get_or_none(name=message.from_user.username)
     await state.finish()
-    if user is None:
-        await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
-        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
-        return
+    await check_user(user=user, message=message)
     if user.token is None:
         await message.answer("Токен отсутствует, пожалуйста запустите команду /start")
         await message.answer_sticker(r'CAACAgIAAxkBAAEFi9hi9uuurzaZQ1xvvEMDWMd4nuSudQACdhAAAv1LuUlu4b2XAAHWXRUpBA')
@@ -79,10 +84,7 @@ async def finish_token(message: types.Message, state: FSMContext):
 async def add_clan_token(message: types.Message, state: FSMContext):
     user = await User.get_or_none(name=message.from_user.username)
     await state.finish()
-    if user is None:
-        await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
-        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
-        return
+    await check_user(user=user, message=message)
     if user.clan_token:
         await message.answer("Токен клана есть, чтобы его поменять, воспользуйтесь командой /change_clan")
         await message.answer_sticker(r'CAACAgIAAxkBAAEFi9hi9uuurzaZQ1xvvEMDWMd4nuSudQACdhAAAv1LuUlu4b2XAAHWXRUpBA')
@@ -95,10 +97,7 @@ async def add_clan_token(message: types.Message, state: FSMContext):
 async def change_clan_token(message: types.Message, state: FSMContext):
     user = await User.get_or_none(name=message.from_user.username)
     await state.finish()
-    if user is None:
-        await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
-        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
-        return
+    await check_user(user=user, message=message)
     if user.clan_token is None:
         await message.answer("Токен клана отсутствует, чтобы его добавить, воспользуйтесь командой /add_clan")
         await message.answer_sticker(r'CAACAgIAAxkBAAEFi9hi9uuurzaZQ1xvvEMDWMd4nuSudQACdhAAAv1LuUlu4b2XAAHWXRUpBA')
