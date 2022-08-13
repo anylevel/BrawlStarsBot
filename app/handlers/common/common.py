@@ -26,11 +26,11 @@ class ClanToken(StatesGroup):
 @dp.message_handler(commands=["start"], state="*")
 async def start(message: types.Message, state: FSMContext):
     user = await User.get_or_none(name=message.from_user.username)
+    await state.finish()
     if user:
         if user.token:
             await message.answer(f"Вы уже отправили токен боту,чтобы его поменять, воспользуйтесь командой /change")
             await message.answer_sticker(r"CAACAgIAAxkBAAEFi9xi9uvblI8N5D60sATRd5syM8FOzwAC9w4AAhLsuEm-DE44RkUN8CkE")
-            await state.finish()
             return
     await message.answer(f"{message.from_user.username}, Введите токен")
     await Token.waiting_for_get_token.set()
@@ -39,15 +39,14 @@ async def start(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=["change"], state='*')
 async def change(message: types.Message, state: FSMContext):
     user = await User.get_or_none(name=message.from_user.username)
+    await state.finish()
     if user is None:
         await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
         await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
-        await state.finish()
         return
     if user.token is None:
         await message.answer("Токен отсутствует, пожалуйста запустите команду /start")
         await message.answer_sticker(r'CAACAgIAAxkBAAEFi9hi9uuurzaZQ1xvvEMDWMd4nuSudQACdhAAAv1LuUlu4b2XAAHWXRUpBA')
-        await state.finish()
         return
     await message.answer(f"{message.from_user.username}, Введите токен")
     await Token.waiting_for_get_token.set()
@@ -76,15 +75,47 @@ async def finish_token(message: types.Message, state: FSMContext):
     await ClanToken.next()
 
 
+@dp.message_handler(commands=["add_clan"], state='*')
+async def add_clan_token(message: types.Message, state: FSMContext):
+    user = await User.get_or_none(name=message.from_user.username)
+    await state.finish()
+    if user is None:
+        await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
+        return
+    if user.clan_token:
+        await message.answer("Токен клана есть, чтобы его поменять, воспользуйтесь командой /change_clan")
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9hi9uuurzaZQ1xvvEMDWMd4nuSudQACdhAAAv1LuUlu4b2XAAHWXRUpBA')
+        return
+    await message.answer("Введите токен клана:")
+    await ClanToken.finish_get_token.set()
+
+
+@dp.message_handler(commands=["change_clan"], state="*")
+async def change_clan_token(message: types.Message, state: FSMContext):
+    user = await User.get_or_none(name=message.from_user.username)
+    await state.finish()
+    if user is None:
+        await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Zi9uuNW2iBg3Seg0Yri0hLTLoCPgAClxEAAgr0uUljGaSXWDc7hikE')
+        return
+    if user.clan_token is None:
+        await message.answer("Токен клана отсутствует, чтобы его добавить, воспользуйтесь командой /add_clan")
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFi9hi9uuurzaZQ1xvvEMDWMd4nuSudQACdhAAAv1LuUlu4b2XAAHWXRUpBA')
+        return
+    await message.answer("Введите токен клана:")
+    await ClanToken.finish_get_token.set()
+
+
 @dp.message_handler(state=ClanToken.waiting_for_get_token)
 async def choose_clan_token(message: types.Message, state: FSMContext):
     if message.text == "Нет":
-        await message.answer('Чтобы добавить токен клана потом,можно воспользоваться командой /change_clan',
+        await message.answer('Чтобы добавить токен клана потом,можно воспользоваться командой /add_clan',
                              reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
         return
     elif message.text == "Да":
-        await message.answer('Введите токен клана', reply_markup=types.ReplyKeyboardRemove())
+        await message.answer('Введите токен клана:', reply_markup=types.ReplyKeyboardRemove())
         await ClanToken.next()
         return
     else:
