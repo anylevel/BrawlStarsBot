@@ -79,7 +79,7 @@ async def finish_token(message: types.Message, state: FSMContext):
 @dp.message_handler(state=ClanToken.waiting_for_get_token)
 async def choose_clan_token(message: types.Message, state: FSMContext):
     if message.text == "Нет":
-        await message.answer('Чтобы добавить токен клана,воспользуйтесь командой /change_clan',
+        await message.answer('Чтобы добавить токен клана потом,можно воспользоваться командой /change_clan',
                              reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
         return
@@ -101,6 +101,19 @@ async def finish_clan_token(message: types.Message, state: FSMContext):
     await state.finish()
     await message.reply("Токен клана успешно обновлен!")
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi8pi9uqPw9gi73z_7sZhjQoJ_J9yKAACiw8AAiRsuEkuUDkZ0De6TikE')
+
+#TODO команда для отдельного добавления токена клана
+
+@dp.message_handler(commands=['help'])
+async def information_about_project(message: types.Message):
+    buttons = [
+        types.InlineKeyboardButton(text="Github", url='https://github.com/anylevel/BrawlStarsBot'),
+        types.InlineKeyboardButton(text="Telegram", url='https://t.me/Anylevel')
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    keyboard.add(*buttons)
+    await message.answer("Information about the project and the author:", reply_markup=keyboard)
+    await message.answer_sticker(r'CAACAgIAAxkBAAEFi95i9vY_P76wYjE3I3w6thQfjOUgIAACtwADw7nhMB8bl05QzRNTKQQ')
 
 
 @dp.message_handler(content_types=ContentType.ANY)
