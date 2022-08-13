@@ -80,14 +80,25 @@ class TokenMiddleware(BaseMiddleware):
         handler = current_handler.get()
         module_name = handler.__module__.split('.')[-1]
         if handler and module_name == "brawl_api":
-            #TODO add check token clan
-            await self.check_token(message)
+            user = await User.get_or_none(name=message.from_user.username)
+            if user is None:
+                await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
+                await message.answer_sticker(
+                    r'CAACAgIAAxkBAAEFjIVi91yAp_UKubzoOiiidvfimaLx9QAC8gwAAuiJCUtb2eA7d4pURikE')
+                raise CancelHandler()
+            if 'clan' in handler.__name__:
+                await self.check_clan_token(message, user)
+                return
+            await self.check_player_token(message, user)
 
-    async def check_token(self, message: types.Message):
-        user = await User.get_or_none(name=message.from_user.username)
-        if user is None:
-            await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
-            raise CancelHandler()
-        elif user.token is None:
+    async def check_player_token(self, message: types.Message, user):
+        if user.token is None:
             await message.answer(f"Токен отсутствует, пожалуйста запустите команду /start")
+            await message.answer_sticker(r'CAACAgIAAxkBAAEFjIdi91ytINW8O-rEkHWUNejnQvtr3wAC4wwAAtQbAUun32PY5_JyhSkE')
+            raise CancelHandler()
+
+    async def check_clan_token(self, message: types.Message, user):
+        if user.clan_token is None:
+            await message.answer(f"Токен отсутствует, пожалуйста запустите команду /start , /change_clan")
+            await message.answer_sticker(r'CAACAgIAAxkBAAEFjIdi91ytINW8O-rEkHWUNejnQvtr3wAC4wwAAtQbAUun32PY5_JyhSkE')
             raise CancelHandler()
