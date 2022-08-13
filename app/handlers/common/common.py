@@ -93,16 +93,17 @@ async def choose_clan_token(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=ClanToken.finish_get_token)
 async def finish_clan_token(message: types.Message, state: FSMContext):
-    token, result = await hashtag_clan_check(hashtag=message.text)
+    clan_token, result = await hashtag_clan_check(hashtag=message.text)
     if result is False:
-        await message.reply(f"Токен {token} является некорректным.Пример: 8YPQ209 или 8ypq209\nВведите снова!")
+        await message.reply(f"Токен {clan_token} является некорректным.Пример: 8YPQ209 или 8ypq209\nВведите снова!")
         return
-    await User.update_or_create(name=message.from_user.username, defaults={"clan_token": token})
+    await User.update_or_create(name=message.from_user.username, defaults={"clan_token": clan_token})
     await state.finish()
     await message.reply("Токен клана успешно обновлен!")
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi8pi9uqPw9gi73z_7sZhjQoJ_J9yKAACiw8AAiRsuEkuUDkZ0De6TikE')
 
-#TODO команда для отдельного добавления токена клана
+
+# TODO команда для отдельного добавления токена клана
 
 @dp.message_handler(commands=['help'])
 async def information_about_project(message: types.Message):
