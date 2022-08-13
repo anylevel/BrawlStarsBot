@@ -34,9 +34,6 @@ async def get_player_info(message: types.Message):
     await message.answer_sticker(brawlers_dict[top_brawlers[0]['name']])
 
 
-# TODO кланы выводить название открыт/закрыт сколько трофеев нужно сколько всего трофеев
-# TODO профиль президента сколько членов старейшин и т.д и топ 5 игроков
-
 async def info_clan_members(members: List) -> Tuple[Dict, Dict]:
     president = dict()
     members_role = {"vicePresident": 0, "senior": 0, "member": 0}
