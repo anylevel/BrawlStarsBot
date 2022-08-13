@@ -80,11 +80,12 @@ class TokenMiddleware(BaseMiddleware):
         handler = current_handler.get()
         module_name = handler.__module__.split('.')[-1]
         if handler and module_name == "brawl_api":
+            #TODO add check token clan
             await self.check_token(message)
 
     async def check_token(self, message: types.Message):
-        user = await User.get(name=message.from_user.username)
-        if not user:
+        user = await User.get_or_none(name=message.from_user.username)
+        if user is None:
             await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
             raise CancelHandler()
         elif user.token is None:
