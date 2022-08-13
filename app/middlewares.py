@@ -99,6 +99,6 @@ class TokenMiddleware(BaseMiddleware):
 
     async def check_clan_token(self, message: types.Message, user):
         if user.clan_token is None:
-            await message.answer(f"Токен отсутствует, пожалуйста запустите команду /start , /change_clan")
+            await message.answer(f"Токен отсутствует, пожалуйста запустите команду:\n /start , /add_clan")
             await message.answer_sticker(r'CAACAgIAAxkBAAEFjIdi91ytINW8O-rEkHWUNejnQvtr3wAC4wwAAtQbAUun32PY5_JyhSkE')
             raise CancelHandler()
