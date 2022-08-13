@@ -28,3 +28,8 @@ async def hashtag_clan_check(hashtag: str) -> tuple[str, bool]:
 async def get_token(message: types.Message):
     user = await User.get(name=message.from_user.username)
     return user.token
+
+
+async def get_clan_token(message: types.Message):
+    user = await User.get(name=message.from_user.username)
+    return user.clan_token
