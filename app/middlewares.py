@@ -3,20 +3,7 @@ from aiogram.dispatcher.handler import CancelHandler, current_handler
 from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram.utils.exceptions import Throttled
 from aiogram import types, Dispatcher
-from .constans import commands, states
-
-
-class HandlerMiddleware(BaseMiddleware):
-    async def on_process_message(self, message: types.Message, data: dict):
-        if message.text in commands:
-            return
-        try:
-            if data["raw_state"] not in states:
-                raise CancelHandler()
-        except KeyError:
-            raise CancelHandler()
-        finally:
-            await message.answer("Я понимаю только команды которые придумал мой создатель!")
+from .models import User
 
 
 class ThrottlingMiddleware(BaseMiddleware):
@@ -24,12 +11,12 @@ class ThrottlingMiddleware(BaseMiddleware):
     Simple middleware
     """
 
-    def __init__(self, limit=3, key_prefix='antiflood_message'):
+    def __init__(self, limit=1, key_prefix='antiflood_message'):
         self.rate_limit = limit
         self.prefix = key_prefix
         super(ThrottlingMiddleware, self).__init__()
 
-    async def on_process_message(self, message: types.Message, data: dict):
+    async def on_pre_process_message(self, message: types.Message, data: dict):
         """
         This handler is called when dispatcher receives a message
         :param message:
@@ -66,14 +53,15 @@ class ThrottlingMiddleware(BaseMiddleware):
         dispatcher = Dispatcher.get_current()
 
         # Calculate how many time is left till the block ends
-        #delta = throttled.rate - throttled.delta
+        # delta = throttled.rate - throttled.delta
 
         # Prevent flooding
         if throttled.exceeded_count <= 2:
             await message.reply('Too many requests! ')
+            await message.answer_sticker(r'CAACAgIAAxkBAAEFi9Ri9utmtRVKxix9DPpTRQhjmyOapQACjBAAAj4iUUlZTqiYUcBoVCkE')
 
         # Sleep.
-        await asyncio.sleep(30)
+        await asyncio.sleep(10)
 
         # Check lock status
         thr = await dispatcher.check_key(key)
@@ -81,3 +69,24 @@ class ThrottlingMiddleware(BaseMiddleware):
         # If current message is not last with current key - do not send message
         if thr.exceeded_count == throttled.exceeded_count:
             await message.reply('Unlocked.')
+
+
+class TokenMiddleware(BaseMiddleware):
+    def __init__(self):
+        self.flag = False
+        super(TokenMiddleware, self).__init__()
+
+    async def on_process_message(self, message: types.Message, data: dict):
+        handler = current_handler.get()
+        module_name = handler.__module__.split('.')[-1]
+        if handler and module_name == "brawl_api":
+            await self.check_token(message)
+
+    async def check_token(self, message: types.Message):
+        user = await User.get(name=message.from_user.username)
+        if not user:
+            await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
+            raise CancelHandler()
+        elif user.token is None:
+            await message.answer(f"Токен отсутствует, пожалуйста запустите команду /start")
+            raise CancelHandler()
