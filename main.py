@@ -10,6 +10,10 @@ import asyncio
 bot = Bot(token=get_token_bot())
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
+#TODO Разобраться в локалях языка и добавить их
+#TODO Добавить логирование aiologger/logger/loguru?
+#TODO добавить readme.md и в репу добавить пример config файла!
+
 
 async def main():
     headers = {

@@ -80,3 +80,7 @@ async def get_clan_info(message: types.Message):
 
     await message.answer(f"Top 5 players of the clan:\n"
                          f"{text_players}")
+
+#TODO Сделать команду battlelog которая будет подсчитывать стату делать диаграммы и угарные смайлы типа мегахорош
+#TODO Сделать местный топ по винрейту и кубкам
+#TODO  сделать рейтинг узнать код страны и сделать это все с обычной клавиатурой

@@ -10,3 +10,6 @@ class User(Model):
 
     def __str__(self):
         return f'{self.name}:{self.token}:{self.clan_token}'
+
+#TODO сделать еще одну модель типа токен-battlelog и сделать foreign key! разобраться с ним!
+#TODO подумать нужно ли добавлять поля типа процент выйграша проигрыш и тд
