@@ -79,7 +79,7 @@ class TokenMiddleware(BaseMiddleware):
     async def on_process_message(self, message: types.Message, data: dict):
         handler = current_handler.get()
         module_name = handler.__module__.split('.')[-1]
-        if handler and module_name == "brawl_api":
+        if module_name == "brawl_api" or module_name == "internal_raiting":
             user = await User.get_or_none(name=message.from_user.username)
             if user is None:
                 await message.answer("Произошло что-то непредвиденное, пожалуйста запустите команду /start")
