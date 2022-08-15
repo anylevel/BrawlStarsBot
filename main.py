@@ -3,16 +3,17 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiohttp import ClientSession
 from app.sessions import Sessions
 from app.database import create_table, init
-from app.middlewares import *
+from app.middlewares import ThrottlingMiddleware, TokenMiddleware
 from app.constans import get_token_api, get_token_bot
 import asyncio
 
 bot = Bot(token=get_token_bot())
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
-#TODO Разобраться в локалях языка и добавить их
-#TODO Добавить логирование aiologger/logger/loguru?
-#TODO добавить readme.md и в репу добавить пример config файла!
+
+# TODO Разобраться в локалях языка и добавить их
+# TODO Добавить логирование aiologger/logger/loguru?
+# TODO добавить readme.md и в репу добавить пример config файла!
 
 
 async def main():
@@ -27,7 +28,6 @@ async def main():
         await init()
 
         dp.middleware.setup(ThrottlingMiddleware())
-        #dp.middleware.setup(HandlerMiddleware())
         dp.middleware.setup(TokenMiddleware())
 
         await dp.start_polling()
