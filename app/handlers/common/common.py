@@ -73,14 +73,18 @@ async def finish_token(message: types.Message, state: FSMContext):
     player, _ = await Player.update_or_create(token=token,
                                               defaults={"name": data["name"], "trophies": data["trophies"],
                                                         "highest_trophies": data["highestTrophies"]})
-    await User.update_or_create(name=message.from_user.username, defaults={"token": token, "player": player})
+    user, _ = await User.update_or_create(name=message.from_user.username, defaults={"token": token, "player": player})
     await state.finish()
-    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = ["Да", "Нет"]
-    keyboard.add(*buttons)
-    await message.reply("Токен успешно обновлен!\nХотите добавить токен клана?", reply_markup=keyboard)
+    if user.clan_token is None:
+        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        buttons = ["Да", "Нет"]
+        keyboard.add(*buttons)
+        await message.reply("Токен успешно обновлен!\nХотите добавить токен клана?", reply_markup=keyboard)
+        await ClanToken.next()
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFi8xi9uqzA053oQ7r8UdW6nUphYeT5wACcw4AAqoLuUnMpE9nFGaW9ykE')
+        return
+    await message.reply("Токен успешно обновлен!")
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi8xi9uqzA053oQ7r8UdW6nUphYeT5wACcw4AAqoLuUnMpE9nFGaW9ykE')
-    await ClanToken.next()
 
 
 @dp.message_handler(commands=["add_clan"], state='*')
@@ -112,8 +116,9 @@ async def change_clan_token(message: types.Message, state: FSMContext):
 @dp.message_handler(state=ClanToken.waiting_for_get_token)
 async def choose_clan_token(message: types.Message, state: FSMContext):
     if message.text == "Нет":
-        await message.answer('Чтобы добавить токен клана потом,можно воспользоваться командой /add_clan',
-                             reply_markup=types.ReplyKeyboardRemove())
+        await message.answer(
+            'Чтобы добавить токен клана потом,можно воспользоваться командой /add_clan или /change_clan если он есть',
+            reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
         return
     elif message.text == "Да":
