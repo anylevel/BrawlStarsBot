@@ -18,6 +18,33 @@ def get_token_bot() -> str:
 
 # commands = ["/start", "/change", "/cancel", "/player_info"]
 # states = ["Token:waiting_for_get_token", "ClanToken:waiting_for_get_token", "ClanToken:finish_get_token"]
+
+places = {'0': "th", '1': "st", '2': "nd", '3': 'rd', '4': 'th', '5': 'fifth', '6': 'th', '7': "th", '8': "th",
+          '9': "th", '10': "th"}
+stickers_top_players = [r'CAACAgIAAxkBAAEFkfVi-r-kGtL6Iq7sPeOk9IFl0CMoqQACJw8AAj5UgUst62DahfT24SkE',
+                        r'CAACAgIAAxkBAAEFkfdi-r-oyFXMKGScDS10AlbrfFj2iAACERAAAsZ1oUtdujJ6liKARykE',
+                        r'CAACAgIAAxkBAAEFkfli-r-sYJeugJYAAZPfq6-RHvrHtakAAuoMAAKidYBLMtFcifLlxSgpBA',
+                        r'CAACAgIAAxkBAAEFkfti-r-voujcrgkgC4dvoTFZp1U2KgACThEAAnkSeUscyQpmwWBjAAEpBA',
+                        r'CAACAgIAAxkBAAEFkf1i-r-xczWvAvxKKsRqvy91k79_VwACEhEAAuGDoUpK4nb80P_UGCkE',
+                        r'CAACAgIAAxkBAAEFkf9i-r-0bPbcnsY-ST58rQ9FzCQ3VwACEhAAAhj6oEpr_t_5Y2iZHSkE',
+                        r'CAACAgIAAxkBAAEFkgFi-r_d90-fUXc4OotnfV_h1YsgCQACagwAAnTNCEt2YmvpJSk7dikE',
+                        r'CAACAgIAAxkBAAEFkgNi-r_hghtysNq64_TeVSYa-IBeMAACWAwAAvF-CUsWv4wpzmPG0ikE',
+                        r'CAACAgIAAxkBAAEFkgVi-r_oIBne94vEggpNf3V669TqOAACBBoAAtQY2EqWHjOp_x8M1CkE']
+
+sticker_trophies = [r'CAACAgIAAxkBAAEFkgdi-sDvFCnmqYI_ikVk2oAoeGo2VAACpQADw7nhMDK93z-SzMIvKQQ',
+                    r'CAACAgIAAxkBAAEFkgli-sDxGhd-TbArx6NqJKUla1X9MQACrAADw7nhMMNcWFVaXpzqKQQ',
+                    r'CAACAgIAAxkBAAEFkgti-sD1HmtwhC1nwJexYbY-8BkyXwACqAADw7nhMMgodXiytoN1KQQ',
+                    r'CAACAgIAAxkBAAEFkgxi-sD2LEocVG0dRkr45VX3CPTS8gACqQADw7nhMFl4xwnn3W8tKQQ',
+                    r'CAACAgIAAxkBAAEFkg5i-sD2JJHEtP1Pt-Ypw6k8ZY2K6wACqgADw7nhMGK-wPdi5twXKQQ',
+                    r'CAACAgIAAxkBAAEFkhFi-sD4ZGbwKPxQ7NEaahImtwpdUwAC8QsAApSd-UrLGGOpFMFeHikE',
+                    r'CAACAgIAAxkBAAEFkhJi-sD5zYkBLZPANlxICNE_kevEmwACdA4AAh7GUEviJXY_KNTeLykE',
+                    r'CAACAgIAAxkBAAEFkhRi-sD6teI0URLg0LNMe1c0y7E9GwACqQ0AAvOw-ErioxSw0PYohCkE',
+                    r'CAACAgIAAxkBAAEFkhZi-sD6lAhKdRDoD-rjw2dlnYko0AACCgwAAm8D-EoAAUcuhCSOBlgpBA',
+                    r'CAACAgIAAxkBAAEFkhhi-sD8ql4M7w3K_zDh2NIp-AEn4gACQxAAAsqeUEnxT01aLvxlwCkE',
+                    r'CAACAgIAAxkBAAEFkhpi-sD9qk2ZJShIs9tq932X9_BKjgACCRAAAiV0WUl2iKtp0XCCuSkE',
+                    r'CAACAgIAAxkBAAEFkhti-sD-GjFfqbfqSzhcg_8wWz7muwACHBEAAlzEUUlX3oy74ZKSBSkE',
+                    r'CAACAgIAAxkBAAEFkh9i-sEBnAiosAij1aBXYsOECJE69AACgBIAAgiOWEk6S9V1AAGHuIwpBA']
+
 brawlers_dict = {"SHELLY": r'CAACAgIAAxkBAAEFi_di90xHAqUsEsYx3v_02sEGY3hxvAACWRUAAgRD0Ugm0W4hTStboCkE',
                  "COLT": r'CAACAgIAAxkBAAEFjHRi91ilTEZc2tNmIQngsjhiSKFDOgAC-hcAAvi7EUjCkqNxqNbugSkE',
                  "BULL": r'CAACAgIAAxkBAAEFi_ti900dYIAgVlBt5y0XrhVhqB8g-AACYREAAvicgUlmSsYsEEC-uykE',
