@@ -66,12 +66,14 @@ async def cancel(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=Token.waiting_for_get_token)
 async def finish_token(message: types.Message, state: FSMContext):
-    token, result = await hashtag_check(message.text)
+    token, result, data = await hashtag_check(message.text)
     if result is False:
         await message.reply(f"Токен {token} является некорректным.Пример: 9QCG9QC8C или 9qcg9qc8c\nВведите снова")
         return
-    player, _ = await Player.get_or_create(token=token)
-    await User.update_or_create(name=message.from_user.username, defaults={"token":token,"player": player})
+    player, _ = await Player.update_or_create(token=token,
+                                              defaults={"name": data["name"], "trophies": data["trophies"],
+                                                        "highest_trophies": data["highestTrophies"]})
+    await User.update_or_create(name=message.from_user.username, defaults={"token": token, "player": player})
     await state.finish()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     buttons = ["Да", "Нет"]
