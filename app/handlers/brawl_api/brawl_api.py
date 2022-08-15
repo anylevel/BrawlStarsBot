@@ -75,7 +75,7 @@ async def get_clan_info(message: types.Message):
         text_players += f"""
         {count}.Name:{top_player['name']}
                 Tag:{top_player['tag']}
-                Trophies{top_player['trophies']}                        
+                Trophies:{top_player['trophies']}                        
                         """
 
     await message.answer(f"Top 5 players of the clan:\n"
