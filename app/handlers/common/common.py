@@ -5,7 +5,7 @@ from main import dp
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from app.models import User
+from app.models import User, Player
 from app.handlers.brawl_api.utils import hashtag_check, hashtag_clan_check
 
 
@@ -70,7 +70,8 @@ async def finish_token(message: types.Message, state: FSMContext):
     if result is False:
         await message.reply(f"Токен {token} является некорректным.Пример: 9QCG9QC8C или 9qcg9qc8c\nВведите снова")
         return
-    await User.update_or_create(name=message.from_user.username, defaults={"token": token})
+    player, _ = await Player.get_or_create(token=token)
+    await User.update_or_create(name=message.from_user.username, defaults={"token":token,"player": player})
     await state.finish()
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     buttons = ["Да", "Нет"]
