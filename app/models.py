@@ -18,9 +18,13 @@ class Player(Model):
     name = fields.CharField(max_length=100, null=True)
     token = fields.CharField(max_length=9, default=None)
     trophies = fields.IntField(null=True)
+    highest_trophies = fields.IntField(null=True)
     battle_log = fields.data.JSONField(null=True)
 
-    # def __str__(self):
-    #     return f'{self.name}:{self.trophies}'
+    class Meta:
+        ordering = ["-trophies", "-highest_trophies"]
+
+    def __str__(self):
+        return f'Name:{self.name}\n\t\t  Token:#{self.token}\n\t\t  Trophies:{self.trophies}\n'
 # TODO сделать еще одну модель типа токен-battlelog и сделать foreign key! разобраться с ним!
 # TODO подумать нужно ли добавлять поля типа процент выйграша проигрыш и тд
