@@ -5,7 +5,7 @@ from main import dp
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from app.models import User, Player
+from app.models import User, Player, Clan
 from app.handlers.brawl_api.utils import hashtag_check, hashtag_clan_check
 
 
@@ -70,10 +70,11 @@ async def finish_token(message: types.Message, state: FSMContext):
     if result is False:
         await message.reply(f"Токен {token} является некорректным.Пример: 9QCG9QC8C или 9qcg9qc8c\nВведите снова")
         return
+
+    user, _ = await User.update_or_create(name=message.from_user.username, defaults={"token": token})
     player, _ = await Player.update_or_create(token=token,
                                               defaults={"name": data["name"], "trophies": data["trophies"],
-                                                        "highest_trophies": data["highestTrophies"]})
-    user, _ = await User.update_or_create(name=message.from_user.username, defaults={"token": token, "player": player})
+                                                        "highest_trophies": data["highestTrophies"], "user": user})
     await state.finish()
     if user.clan_token is None:
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -131,11 +132,15 @@ async def choose_clan_token(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=ClanToken.finish_get_token)
 async def finish_clan_token(message: types.Message, state: FSMContext):
-    clan_token, result = await hashtag_clan_check(hashtag=message.text)
+    clan_token, result, data = await hashtag_clan_check(hashtag=message.text)
     if result is False:
         await message.reply(f"Токен {clan_token} является некорректным.Пример: 8YPQ209 или 8ypq209\nВведите снова!")
         return
-    await User.update_or_create(name=message.from_user.username, defaults={"clan_token": clan_token})
+    user, _ = await User.update_or_create(name=message.from_user.username,
+                                          defaults={"clan_token": clan_token})
+    clan, _ = await Clan.update_or_create(token=clan_token,
+                                          defaults={"name": data["name"], "trophies": data["trophies"], "user": user})
+
     await state.finish()
     await message.reply("Токен клана успешно обновлен!")
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi8pi9uqPw9gi73z_7sZhjQoJ_J9yKAACiw8AAiRsuEkuUDkZ0De6TikE')
