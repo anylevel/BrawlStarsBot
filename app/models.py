@@ -7,8 +7,6 @@ class User(Model):
     name = fields.CharField(max_length=100)
     token = fields.CharField(max_length=9, default=None)
     clan_token = fields.CharField(max_length=9, null=True)
-    player = fields.ForeignKeyField('models.Player', related_name='player')
-    clan = fields.ForeignKeyField('models.Player', related_name='clan')
 
     def __str__(self):
         return f'{self.name}:{self.token}:{self.clan_token}'
@@ -21,6 +19,7 @@ class Player(Model):
     trophies = fields.IntField()
     highest_trophies = fields.IntField()
     battle_log = fields.data.JSONField(null=True)
+    user = fields.OneToOneField('models.User', related_name='players')
 
     class Meta:
         ordering = ["-trophies", "-highest_trophies"]
@@ -33,7 +32,11 @@ class Clan(Model):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=50)
     token = fields.CharField(max_length=9)
-    trophies = fields.IntField(null=True)
+    trophies = fields.IntField()
+    user = fields.OneToOneField('models.User', related_name='clans')
+
+    class Meta:
+        ordering = ["-trophies", "name"]
 
     def __str__(self):
         return f'Name:{self.name}\n\t\t  Token:#{self.token}\n\t\t  Trophies:{self.trophies}\n'
