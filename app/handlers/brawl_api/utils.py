@@ -1,5 +1,5 @@
 from app.sessions import Sessions
-from app.models import User, Player
+from app.models import User, Player, Clan
 from aiogram import types
 from typing import Any
 
@@ -37,5 +37,10 @@ async def get_clan_token(message: types.Message):
 
 
 async def get_player_from_user(message: types.Message):
-    player = await Player(token=await get_token(message=message))
+    player = await Player.get(token=await get_token(message=message))
     return player
+
+
+async def get_clan_from_user(message: types.Message):
+    clan = await Clan.get(token=await get_clan_token(message=message))
+    return clan
