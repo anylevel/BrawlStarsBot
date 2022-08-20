@@ -68,7 +68,8 @@ async def cancel(message: types.Message, state: FSMContext):
 async def finish_token(message: types.Message, state: FSMContext):
     token, result, data = await hashtag_check(message.text)
     if result is False:
-        await message.reply(f"Токен {token} является некорректным.Пример: 9QCG9QC8C или 9qcg9qc8c\nВведите снова")
+        await message.reply(
+            f"Токен {token} является некорректным.Пример: 9QCG9QC8C , 9qcg9qc8c ,#9QCG9QC8C , #9qcg9qc8c \nВведите снова")
         return
 
     user, _ = await User.update_or_create(name=message.from_user.username, defaults={"token": token})
@@ -134,7 +135,8 @@ async def choose_clan_token(message: types.Message, state: FSMContext):
 async def finish_clan_token(message: types.Message, state: FSMContext):
     clan_token, result, data = await hashtag_clan_check(hashtag=message.text)
     if result is False:
-        await message.reply(f"Токен {clan_token} является некорректным.Пример: 8YPQ209 или 8ypq209\nВведите снова!")
+        await message.reply(
+            f"Токен {clan_token} является некорректным.Пример: 8YPQ209 , 8ypq209 , #8YPQ209 ,#8ypq209 \nВведите снова!")
         return
     user, _ = await User.update_or_create(name=message.from_user.username,
                                           defaults={"clan_token": clan_token})
@@ -146,7 +148,7 @@ async def finish_clan_token(message: types.Message, state: FSMContext):
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi8pi9uqPw9gi73z_7sZhjQoJ_J9yKAACiw8AAiRsuEkuUDkZ0De6TikE')
 
 
-@dp.message_handler(commands=['help'])
+@dp.message_handler(commands=['about'])
 async def information_about_project(message: types.Message):
     buttons = [
         types.InlineKeyboardButton(text="Github", url='https://github.com/anylevel/BrawlStarsBot'),
