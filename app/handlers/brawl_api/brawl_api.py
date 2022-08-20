@@ -1,9 +1,12 @@
 from typing import Dict, List, Tuple
 from aiogram import types
-from main import dp
+from main import dp, bot
 from app.sessions import Sessions
-from .utils import session_name, get_token, get_clan_token
-from app.constans import brawlers_dict
+from .utils import session_name_brawl_api, session_name_brawlify, get_token, get_clan_token
+from app.constans import brawlers_dict, maps
+from bs4 import BeautifulSoup
+
+new_line = '\\n'
 
 
 @dp.message_handler(commands=["player_info"])
@@ -11,8 +14,9 @@ async def get_player_info(message: types.Message):
     token = await get_token(message=message)
     url_get_player_info = f"https://api.brawlstars.com/v1/players/%23{token}/"
     url_get_brawlers = "https://api.brawlstars.com/v1/brawlers"
-    async with Sessions.get_response(name=session_name, url=url_get_player_info) as response_information_player, \
-            Sessions.get_response(name=session_name, url=url_get_brawlers) as response_information_brawlers:
+    async with Sessions.get_response(name=session_name_brawl_api,
+                                     url=url_get_player_info) as response_information_player, \
+            Sessions.get_response(name=session_name_brawl_api, url=url_get_brawlers) as response_information_brawlers:
         brawlers = await response_information_brawlers.json()
         data = await response_information_player.json()
     top_brawlers = sorted(data['brawlers'], key=lambda item: item["trophies"], reverse=True)[:5]
@@ -53,7 +57,7 @@ async def info_clan_members(members: List) -> Tuple[Dict, Dict]:
 async def get_clan_info(message: types.Message):
     clan_token = await get_clan_token(message=message)
     url_get_clan_info = f"https://api.brawlstars.com/v1/clubs/%23{clan_token}/"
-    async with Sessions.get_response(name=session_name, url=url_get_clan_info) as response_clan_info:
+    async with Sessions.get_response(name=session_name_brawl_api, url=url_get_clan_info) as response_clan_info:
         data = await response_clan_info.json()
     president, members_role = await info_clan_members(members=data["members"])
     top_players = data["members"][:5]
@@ -81,6 +85,40 @@ async def get_clan_info(message: types.Message):
     await message.answer(f"Top 5 players of the clan:\n"
                          f"{text_players}")
 
-#TODO Сделать команду battlelog которая будет подсчитывать стату делать диаграммы и угарные смайлы типа мегахорош
-#TODO Сделать местный топ по винрейту и кубкам
-#TODO  сделать рейтинг узнать код страны и сделать это все с обычной клавиатурой
+
+@dp.message_handler(commands=['daily_meta'])
+async def get_daily_meta(message: types.Message):
+    url_get_events = 'https://api.brawlstars.com/v1/events/rotation'
+    async with Sessions.get_response(name=session_name_brawl_api, url=url_get_events) as response_events:
+        data_events = await response_events.json()
+    buttons = list()
+    for data_event in data_events:
+        if 'duo' in data_event['event']['mode']:
+            continue
+
+        buttons.append(types.InlineKeyboardButton(f"{maps[data_event['event']['mode']]}:{data_event['event']['map']}",
+                                                  callback_data=f"{data_event['event']['map']}"))
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    keyboard.add(*buttons)
+    await message.answer('Choose a mod to watch the winrate of brawlers:', reply_markup=keyboard)
+
+
+@dp.callback_query_handler(lambda c: c.data)
+async def choose_map(callback_query: types.CallbackQuery):
+    url_brawlify = "https://brawlify.com/#"
+    async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response:
+        data = await response.read()
+    soup = BeautifulSoup(data, 'lxml')
+    brawlers = soup.find(class_='link opacity event-title-text event-title-map mb-0',
+                         title=callback_query.data).find_next().find_all('a')
+    text_brawlers = f'Top players by winrate on map {callback_query.data}:\n'
+    top_brawler = brawlers[0].get('title').upper()
+    for brawler in brawlers:
+        text_brawlers += f"{brawler.get('title').replace(new_line, ' ')}:{brawler.text.strip()}\n"
+    await bot.answer_callback_query(callback_query.id)
+    await bot.send_message(callback_query.from_user.id, text_brawlers)
+    await bot.send_sticker(callback_query.from_user.id, brawlers_dict[top_brawler])
+    await bot.delete_message(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id)
+# TODO Сделать команду battlelog которая будет подсчитывать стату делать диаграммы и угарные смайлы типа мегахорош
+# TODO Сделать местный топ по винрейту и кубкам
+# TODO  сделать рейтинг узнать код страны и сделать это все с обычной клавиатурой
