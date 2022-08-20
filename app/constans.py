@@ -1,10 +1,9 @@
-import aiofiles
 import os
 
 
-async def get_token_api() -> str:
-    async with aiofiles.open("config.txt", 'r') as file:
-        data = await file.read()
+def get_token_api() -> str:
+    with open("config.txt", 'r') as file:
+        data = file.read()
     token = data.rstrip()
     return token
 
@@ -15,12 +14,26 @@ def get_token_bot() -> str:
         raise ValueError("Ошибка при получении токена")
     return bot_token
 
+    # commands = ["/start", "/change", "/cancel", "/player_info"]
+    # states = ["Token:waiting_for_get_token", "ClanToken:waiting_for_get_token", "ClanToken:finish_get_token"]
 
-# commands = ["/start", "/change", "/cancel", "/player_info"]
-# states = ["Token:waiting_for_get_token", "ClanToken:waiting_for_get_token", "ClanToken:finish_get_token"]
+
+headers_brawl_api = {
+    "Accept": "application/json",
+    "authorization": f"Bearer {get_token_api()}",
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0'
+}
+headers_brawlify = {
+    'Accept': 'text/html',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0'
+}
 
 places = {'0': "th", '1': "st", '2': "nd", '3': 'rd', '4': 'th', '5': 'fifth', '6': 'th', '7': "th", '8': "th",
           '9': "th", '10': "th"}
+
+# TODO дозаполнить
+maps = {"gemGrab": "Gem Grab", "soloShowdown": "Solo Showdown", "brawlBall": "Brawl Ball", "hotZone": "Hot Zone",
+        "knockout": "Knockout", "bigGame": "Big Game", "hunters": "Hunters"}
 stickers_top_players = [r'CAACAgIAAxkBAAEFkfVi-r-kGtL6Iq7sPeOk9IFl0CMoqQACJw8AAj5UgUst62DahfT24SkE',
                         r'CAACAgIAAxkBAAEFkfdi-r-oyFXMKGScDS10AlbrfFj2iAACERAAAsZ1oUtdujJ6liKARykE',
                         r'CAACAgIAAxkBAAEFkfli-r-sYJeugJYAAZPfq6-RHvrHtakAAuoMAAKidYBLMtFcifLlxSgpBA',
