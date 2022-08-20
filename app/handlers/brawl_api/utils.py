@@ -7,8 +7,15 @@ session_name_brawl_api = "brawl_api"
 session_name_brawlify = "brawlify"
 
 
-async def hashtag_check(hashtag: str) -> tuple[str, bool, Any]:
+async def general_hashtag_check(hashtag: str) -> str:
     hashtag = hashtag.upper()
+    if hashtag.startswith('#'):
+        hashtag = hashtag[1:]
+    return hashtag
+
+
+async def hashtag_check(hashtag: str) -> tuple[str, bool, Any]:
+    hashtag = await general_hashtag_check(hashtag=hashtag)
     url = f"https://api.brawlstars.com/v1/players/%23{hashtag}/"
     async with Sessions.get_response(name=session_name_brawl_api, url=url) as response:
         data = await response.json()
@@ -17,9 +24,8 @@ async def hashtag_check(hashtag: str) -> tuple[str, bool, Any]:
     return hashtag, True, data
 
 
-# TODO сделать чтобы кушал хештег с решеткой
 async def hashtag_clan_check(hashtag: str) -> tuple[str, bool, Any]:
-    hashtag = hashtag.upper()
+    hashtag = await general_hashtag_check(hashtag=hashtag)
     url = f"https://api.brawlstars.com/v1/clubs/%23{hashtag}/"
     async with Sessions.get_response(name=session_name_brawl_api, url=url) as response:
         data = await response.json()
