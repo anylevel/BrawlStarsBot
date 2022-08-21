@@ -1,7 +1,8 @@
 from app.sessions import Sessions
 from app.models import User, Player, Clan
 from aiogram import types
-from typing import Any , Dict , List , Tuple
+from typing import Any, Dict, List, Tuple
+from collections import Counter
 
 session_name_brawl_api = "brawl_api"
 
@@ -54,15 +55,8 @@ async def get_clan_from_user(message: types.Message):
 
 
 async def info_clan_members(members: List) -> Tuple[Dict, Dict]:
-    president = dict()
-    members_role = {"vicePresident": 0, "senior": 0, "member": 0}
+    members_role = Counter([member["role"] for member in members])
     for member in members:
         if member["role"] == "president":
-            president = member
-        if member["role"] == "vicePresident":
-            members_role["vicePresident"] += 1
-        elif member["role"] == "senior":
-            members_role["senior"] += 1
-        elif member["role"] == "member":
-            members_role["member"] += 1
-    return president, members_role
+            return member, members_role
+
