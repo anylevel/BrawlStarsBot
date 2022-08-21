@@ -6,19 +6,31 @@ new_line = '\n'
 new_line_f = '\\n'
 
 
-async def parse_daily_meta(data_events: bytes) -> List:
+async def parse_daily_meta(data_events: bytes, class_: str) -> List:
     soup = BeautifulSoup(data_events, 'lxml')
-    events = soup.find_all(class_='link opacity event-title-text event-title-map mb-0')
+    necessary_data = soup.find("div", class_=class_)
+    events = necessary_data.find_all(class_='link opacity event-title-text event-title-map mb-0')
+    if necessary_data.get('id') == "active":
+        text_time = "ends in"
+    else:
+        text_time = "starts in"
     buttons = list()
     for event in events:
         mode = event.find_previous().get('title')
         if 'Duo' in mode:
             continue
         brawl_map = event.get('title')
+        time_int = event.find_previous(class_='event-time text-hp').text
         buttons.append(
-            types.InlineKeyboardButton(f"{mode}:{brawl_map}",
+            types.InlineKeyboardButton(f"{mode}:{brawl_map} {text_time} {time_int}",
                                        callback_data=f"Win rate:{brawl_map}"))
     return buttons
+
+
+async def parse_daily_meta_upcoming(data_events: bytes) -> List:
+    soup = BeautifulSoup(data_events, 'lxml')
+    upcoming_events = soup.find("div", class_="container-fluid pb-2 post-type1")
+    events = upcoming_events.find_all(class_='link opacity event-title-text event-title-map mb-0')
 
 
 async def parse_callback_win_rate(data: bytes, brawl_map: str) -> tuple[str, str]:
