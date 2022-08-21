@@ -87,24 +87,24 @@ async def get_clan_info(message: types.Message):
     await message.answer(f"Top 5 players of the clan:\n"
                          f"{text_players}")
 
-#TODO сделать try except потому что словарь дырявый
-#TODO разделить команды чтобы не просил токен!
+
+# TODO разделить команды чтобы не просил токен!
 @dp.message_handler(commands=['daily_meta'])
 async def get_daily_meta(message: types.Message):
-    url_get_events = 'https://api.brawlstars.com/v1/events/rotation'
-    async with Sessions.get_response(name=session_name_brawl_api, url=url_get_events) as response_events:
-        data_events = await response_events.json()
+    url_get_events = "https://brawlify.com/#"
+    async with Sessions.get_response(name=session_name_brawlify, url=url_get_events) as response_events:
+        data_events = await response_events.read()
+    soup = BeautifulSoup(data_events, 'lxml')
+    events = soup.find_all(class_='link opacity event-title-text event-title-map mb-0')
     buttons = list()
-    for data_event in data_events:
-        if 'duo' in data_event['event']['mode']:
+    for event in events:
+        mode = event.find_previous().get('title')
+        if 'Duo' in mode:
             continue
-        try:
-            buttons.append(
-                types.InlineKeyboardButton(f"{maps[data_event['event']['mode']]}:{data_event['event']['map']}",
-                                           callback_data=f"Win rate:{data_event['event']['map']}"))
-        except KeyError:
-            await message.answer("К сожалению сервис сейчас недоступен!")
-            return
+        brawl_map = event.get('title')
+        buttons.append(
+            types.InlineKeyboardButton(f"{mode}:{brawl_map}",
+                                       callback_data=f"Win rate:{brawl_map}"))
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     keyboard.add(*buttons)
     await message.answer('Choose a mod to watch the winrate of brawlers:', reply_markup=keyboard)
@@ -132,16 +132,25 @@ async def choose_map(callback_query: types.CallbackQuery):
 
 @dp.message_handler(commands=["best_teams"])
 async def get_best_teams(message: types.Message):
-    url_get_events = 'https://api.brawlstars.com/v1/events/rotation'
-    async with Sessions.get_response(name=session_name_brawl_api, url=url_get_events) as response_events:
-        data_events = await response_events.json()
+    url_brawlify =  "https://brawlify.com/#"
+    async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response_events:
+        data_events = await response_events.read()
     buttons = list()
-    for data_event in data_events:
-        if 'solo' in data_event['event']['mode'] or 'big' in data_event['event']['mode']:
-            continue
-        mode = maps[data_event['event']['mode']]
-        buttons.append(types.InlineKeyboardButton(f"{mode}:{data_event['event']['map']}",
-                                                  callback_data=f"Best teams:{data_event['event']['map']}:{mode}"))
+    soup = BeautifulSoup(data_events, 'lxml')
+    all_events = soup.find_all(class_='link opacity event-title-text event-title-map mb-0')
+    result_all_events = list()
+    for event in all_events:
+        mode = event.find_previous().get('title')
+        brawl_map = event.get('title')
+        result_all_events.append((mode, brawl_map))
+    best_teams_events_data = soup.find_all('a', class_="link opacity h2")
+    necessary_events = []
+    for event in best_teams_events_data:
+        necessary_events.append(event.text)
+    for mode, brawl_map in result_all_events:
+        if brawl_map in necessary_events and "Solo" not in mode:
+            buttons.append(types.InlineKeyboardButton(f"{mode}:{brawl_map}",
+                                                      callback_data=f"Best teams:{mode}:{brawl_map}"))
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     keyboard.add(*buttons)
     await message.answer('Choose a mod to watch best teams brawlers on map:', reply_markup=keyboard)
@@ -153,7 +162,7 @@ async def choose_map(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id)
     delimiter = 3
     url_brawlify = "https://brawlify.com/#"
-    _, brawl_map, brawl_mode = callback_query.data.split(':')
+    _, brawl_mode, brawl_map = callback_query.data.split(':')
     if "Duo" in brawl_mode:
         delimiter = 2
     async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response:
