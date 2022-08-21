@@ -1,14 +1,8 @@
-from typing import Dict, List, Tuple
 from aiogram import types
-from main import dp, bot
+from main import dp
 from app.sessions import Sessions
-from .utils import session_name_brawl_api, session_name_brawlify, get_token, get_clan_token
-from app.constans import brawlers_dict, maps, sticker_trophies
-from bs4 import BeautifulSoup
-import random
-
-new_line = '\n'
-new_line_f = '\\n'
+from .utils import get_token, get_clan_token, session_name_brawl_api, info_clan_members
+from app.constans import brawlers_dict
 
 
 @dp.message_handler(commands=["player_info"])
@@ -38,21 +32,6 @@ async def get_player_info(message: types.Message):
                          f"{text_brawlers}"
                          )
     await message.answer_sticker(brawlers_dict[top_brawlers[0]['name']])
-
-
-async def info_clan_members(members: List) -> Tuple[Dict, Dict]:
-    president = dict()
-    members_role = {"vicePresident": 0, "senior": 0, "member": 0}
-    for member in members:
-        if member["role"] == "president":
-            president = member
-        if member["role"] == "vicePresident":
-            members_role["vicePresident"] += 1
-        elif member["role"] == "senior":
-            members_role["senior"] += 1
-        elif member["role"] == "member":
-            members_role["member"] += 1
-    return president, members_role
 
 
 @dp.message_handler(commands=["clan_info"])
@@ -86,109 +65,6 @@ async def get_clan_info(message: types.Message):
 
     await message.answer(f"Top 5 players of the clan:\n"
                          f"{text_players}")
-
-
-# TODO разделить команды чтобы не просил токен!
-@dp.message_handler(commands=['daily_meta'])
-async def get_daily_meta(message: types.Message):
-    url_get_events = "https://brawlify.com/#"
-    async with Sessions.get_response(name=session_name_brawlify, url=url_get_events) as response_events:
-        data_events = await response_events.read()
-    soup = BeautifulSoup(data_events, 'lxml')
-    events = soup.find_all(class_='link opacity event-title-text event-title-map mb-0')
-    buttons = list()
-    for event in events:
-        mode = event.find_previous().get('title')
-        if 'Duo' in mode:
-            continue
-        brawl_map = event.get('title')
-        buttons.append(
-            types.InlineKeyboardButton(f"{mode}:{brawl_map}",
-                                       callback_data=f"Win rate:{brawl_map}"))
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
-    keyboard.add(*buttons)
-    await message.answer('Choose a mod to watch the winrate of brawlers:', reply_markup=keyboard)
-
-
-# TODO parse func
-@dp.callback_query_handler(lambda c: "Win rate" in c.data)
-async def choose_map(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    url_brawlify = "https://brawlify.com/#"
-    brawl_map = callback_query.data.split(':')[1]
-    async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response:
-        data = await response.read()
-    soup = BeautifulSoup(data, 'lxml')
-    brawlers = soup.find(class_='link opacity event-title-text event-title-map mb-0',
-                         title=brawl_map).find_next().find_all('a')
-    text_brawlers = f'Top players by winrate on map {brawl_map}:\n'
-    top_brawler = brawlers[0].get('title').upper()
-    for count, brawler in enumerate(brawlers, start=1):
-        text_brawlers += f"{count}.{brawler.get('title').replace(new_line_f, ' ')}:{brawler.text.strip()}\n"
-    await bot.send_message(callback_query.from_user.id, text_brawlers)
-    await bot.send_sticker(callback_query.from_user.id, brawlers_dict[top_brawler])
-    await bot.delete_message(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id)
-
-
-@dp.message_handler(commands=["best_teams"])
-async def get_best_teams(message: types.Message):
-    url_brawlify =  "https://brawlify.com/#"
-    async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response_events:
-        data_events = await response_events.read()
-    buttons = list()
-    soup = BeautifulSoup(data_events, 'lxml')
-    all_events = soup.find_all(class_='link opacity event-title-text event-title-map mb-0')
-    result_all_events = list()
-    for event in all_events:
-        mode = event.find_previous().get('title')
-        brawl_map = event.get('title')
-        result_all_events.append((mode, brawl_map))
-    best_teams_events_data = soup.find_all('a', class_="link opacity h2")
-    necessary_events = []
-    for event in best_teams_events_data:
-        necessary_events.append(event.text)
-    for mode, brawl_map in result_all_events:
-        if brawl_map in necessary_events and "Solo" not in mode:
-            buttons.append(types.InlineKeyboardButton(f"{mode}:{brawl_map}",
-                                                      callback_data=f"Best teams:{mode}:{brawl_map}"))
-    keyboard = types.InlineKeyboardMarkup(row_width=1)
-    keyboard.add(*buttons)
-    await message.answer('Choose a mod to watch best teams brawlers on map:', reply_markup=keyboard)
-
-
-# TODO func parse
-@dp.callback_query_handler(lambda c: "Best teams" in c.data)
-async def choose_map(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    delimiter = 3
-    url_brawlify = "https://brawlify.com/#"
-    _, brawl_mode, brawl_map = callback_query.data.split(':')
-    if "Duo" in brawl_mode:
-        delimiter = 2
-    async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response:
-        data = await response.read()
-    soup = BeautifulSoup(data, 'lxml')
-    info_maps = soup.find_all('a', class_="link opacity h2")
-    result_map = ''
-    for info_map in info_maps:
-        if brawl_map in info_map.text:
-            result_map = info_map
-            break
-    brawlers_data = result_map.find_next().find_next().find_all('img')
-    brawlers = list()
-    for brawler_data in brawlers_data:
-        brawlers.append(brawler_data.get('title').replace(new_line_f, ' '))
-    text_brawlers = f'The best teams on the map:{brawl_map}{new_line}'
-    count = 1
-    while brawlers:
-        buffer = brawlers[:delimiter]
-        brawlers = brawlers[delimiter:]
-        text_brawlers += f"{str(count)}:{','.join(buffer)}{new_line}"
-        count += 1
-    sticker = random.choice(sticker_trophies)
-    await bot.send_message(callback_query.from_user.id, text_brawlers)
-    await bot.send_sticker(callback_query.from_user.id, sticker)
-    await bot.delete_message(chat_id=callback_query.from_user.id, message_id=callback_query.message.message_id)
 
 # TODO Сделать команду battlelog которая будет подсчитывать стату делать диаграммы и угарные смайлы типа мегахорош
 # TODO  сделать рейтинг узнать код страны и сделать это все с обычной клавиатурой
