@@ -70,7 +70,7 @@ async def check_best_teams_current(necessary_events: List[str],
 async def check_best_teams_upcoming(necessary_events: List[str],
                                     all_events: List[tuple[str, str, str]]) -> List[types.InlineKeyboardButton]:
     buttons = list()
-    necessary_events = [i[13:] for i in necessary_events if "Coming next" in i]
+    necessary_events = [brawl_map[13:] for brawl_map in necessary_events if "Coming next" in brawl_map]
     for mode, brawl_map, time_int in all_events:
         if brawl_map in necessary_events and "Solo" not in mode:
             buttons.append(types.InlineKeyboardButton(f"{mode}:{brawl_map} starts in {time_int}",
