@@ -27,12 +27,6 @@ async def parse_daily_meta(data_events: bytes, class_: str) -> List:
     return buttons
 
 
-async def parse_daily_meta_upcoming(data_events: bytes) -> List:
-    soup = BeautifulSoup(data_events, 'lxml')
-    upcoming_events = soup.find("div", class_="container-fluid pb-2 post-type1")
-    events = upcoming_events.find_all(class_='link opacity event-title-text event-title-map mb-0')
-
-
 async def parse_callback_win_rate(data: bytes, brawl_map: str) -> tuple[str, str]:
     soup = BeautifulSoup(data, 'lxml')
     brawlers = soup.find(class_='link opacity event-title-text event-title-map mb-0',
