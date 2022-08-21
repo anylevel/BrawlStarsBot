@@ -38,22 +38,42 @@ async def parse_callback_win_rate(data: bytes, brawl_map: str) -> tuple[str, str
     return text_brawlers, top_brawler
 
 
-async def parse_best_teams(data_events: bytes) -> List:
-    buttons = list()
+async def parse_best_teams(data_events: bytes, class_: str) -> List:
     soup = BeautifulSoup(data_events, 'lxml')
-    all_events = soup.find_all(class_='link opacity event-title-text event-title-map mb-0')
+    necessary_data = soup.find("div", class_=class_)
+    all_events = necessary_data.find_all(class_='link opacity event-title-text event-title-map mb-0')
     result_all_events = list()
     for event in all_events:
         mode = event.find_previous().get('title')
         brawl_map = event.get('title')
-        result_all_events.append((mode, brawl_map))
+        time_int = event.find_previous(class_='event-time text-hp').text
+        result_all_events.append((mode, brawl_map, time_int))
     best_teams_events_data = soup.find_all('a', class_="link opacity h2")
-    necessary_events = []
-    for event in best_teams_events_data:
-        necessary_events.append(event.text)
-    for mode, brawl_map in result_all_events:
+    necessary_events = [event.text for event in best_teams_events_data]
+    if necessary_data.get('id') == "active":
+        buttons = await check_best_teams_current(necessary_events=necessary_events, all_events=result_all_events)
+    else:
+        buttons = await check_best_teams_upcoming(necessary_events=necessary_events, all_events=result_all_events)
+    return buttons
+
+
+async def check_best_teams_current(necessary_events: List[str],
+                                   all_events: List[tuple[str, str, str]]) -> List[types.InlineKeyboardButton]:
+    buttons = list()
+    for mode, brawl_map, time_int in all_events:
         if brawl_map in necessary_events and "Solo" not in mode:
-            buttons.append(types.InlineKeyboardButton(f"{mode}:{brawl_map}",
+            buttons.append(types.InlineKeyboardButton(f"{mode}:{brawl_map} ends in {time_int}",
+                                                      callback_data=f"Best teams:{mode}:{brawl_map}"))
+    return buttons
+
+
+async def check_best_teams_upcoming(necessary_events: List[str],
+                                    all_events: List[tuple[str, str, str]]) -> List[types.InlineKeyboardButton]:
+    buttons = list()
+    necessary_events = [i[13:] for i in necessary_events if "Coming next" in i]
+    for mode, brawl_map, time_int in all_events:
+        if brawl_map in necessary_events and "Solo" not in mode:
+            buttons.append(types.InlineKeyboardButton(f"{mode}:{brawl_map} starts in {time_int}",
                                                       callback_data=f"Best teams:{mode}:{brawl_map}"))
     return buttons
 
@@ -71,9 +91,9 @@ async def parse_callback_best_teams(data: bytes, callback_data: str):
             result_map = info_map
             break
     brawlers_data = result_map.find_next().find_next().find_all('img')
-    brawlers = list()
-    for brawler_data in brawlers_data:
-        brawlers.append(brawler_data.get('title').replace(new_line_f, ' '))
+    if not brawlers_data:
+        brawlers_data = result_map.find_next().find_next().find_next().find_next().find_all('img')
+    brawlers = [brawler_data.get('title').replace(new_line_f, ' ') for brawler_data in brawlers_data]
     text_brawlers = f'The best teams on the map:{brawl_map}{new_line}'
     count = 1
     while brawlers:
