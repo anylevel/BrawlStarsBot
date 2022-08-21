@@ -49,10 +49,21 @@ async def get_best_teams(message: types.Message):
     url_brawlify = "https://brawlify.com/#"
     async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response_events:
         data_events = await response_events.read()
-    buttons = await parse_best_teams(data_events=data_events)
+    buttons = await parse_best_teams(data_events=data_events, class_='container-fluid post-type4 pt-1 pb-3')
     keyboard = types.InlineKeyboardMarkup(row_width=1)
     keyboard.add(*buttons)
     await message.answer('Choose a mod to watch best teams brawlers on map:', reply_markup=keyboard)
+
+
+@dp.message_handler(commands=["best_teams_upcoming"])
+async def get_best_teams_upcoming(message: types.Message):
+    url_brawlify = "https://brawlify.com/#"
+    async with Sessions.get_response(name=session_name_brawlify, url=url_brawlify) as response_events:
+        data_events = await response_events.read()
+    buttons = await parse_best_teams(data_events=data_events, class_='container-fluid pb-2 post-type1')
+    keyboard = types.InlineKeyboardMarkup(row_width=1)
+    keyboard.add(*buttons)
+    await message.answer('Choose upcoming events to watch best teams brawlers on map:', reply_markup=keyboard)
 
 
 @dp.callback_query_handler(lambda c: "Best teams" in c.data)
