@@ -31,9 +31,6 @@ headers_brawlify = {
 places = {'0': "th", '1': "st", '2': "nd", '3': 'rd', '4': 'th', '5': 'fifth', '6': 'th', '7': "th", '8': "th",
           '9': "th", '10': "th"}
 
-# TODO дозаполнить
-maps = {"gemGrab": "Gem Grab", "soloShowdown": "Solo Showdown", "brawlBall": "Brawl Ball", "hotZone": "Hot Zone",
-        "knockout": "Knockout", "bigGame": "Big Game", "hunters": "Hunters" , "duoShowdown":"Duo Showdown"}
 stickers_top_players = [r'CAACAgIAAxkBAAEFkfVi-r-kGtL6Iq7sPeOk9IFl0CMoqQACJw8AAj5UgUst62DahfT24SkE',
                         r'CAACAgIAAxkBAAEFkfdi-r-oyFXMKGScDS10AlbrfFj2iAACERAAAsZ1oUtdujJ6liKARykE',
                         r'CAACAgIAAxkBAAEFkfli-r-sYJeugJYAAZPfq6-RHvrHtakAAuoMAAKidYBLMtFcifLlxSgpBA',
