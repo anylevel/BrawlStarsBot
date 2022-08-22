@@ -18,7 +18,7 @@ class Player(Model):
     token = fields.CharField(max_length=9)
     trophies = fields.IntField()
     highest_trophies = fields.IntField()
-    battle_log = fields.data.JSONField(null=True)
+    battle_log = fields.data.JSONField(default=list())
     user = fields.OneToOneField('models.User', related_name='players')
 
     class Meta:
