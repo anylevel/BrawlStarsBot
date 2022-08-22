@@ -1,11 +1,18 @@
+import asyncio
 from app.sessions import Sessions
 from app.models import User, Player, Club
 from app.constans import sticker_win_rate
 from aiogram import types
 from typing import Any, Dict, List, Tuple
 from collections import Counter, defaultdict
+from pathlib import Path
+from matplotlib import pyplot as plt
+import uuid
+from aiogram.types import InputFile
+import os
 
 session_name_brawl_api = "brawl_api"
+path_temp = Path.cwd().joinpath("app/temp/")
 
 
 async def general_hashtag_check(hashtag: str) -> str:
@@ -166,3 +173,13 @@ async def calculate_percent(stats: Dict, amount: int) -> tuple[int, int, int, st
     elif percent_wins < 40:
         sticker = sticker_win_rate["Bad"]
     return percent_wins, percent_draw, percent_loses, sticker
+
+
+async def send_photo(win_rate: List, message: types.Message) -> None:
+    plt.pie(win_rate, labels=["Win's", "Lose's", "Draw's"])
+    file_temp = uuid.uuid4().hex
+    path_to_file = path_temp.joinpath(f"{file_temp}.jpeg")
+    plt.savefig(path_to_file, bbox_inches="tight")
+    plt.close()
+    await message.answer_photo(InputFile(path_to_file))
+    os.remove(path_to_file)
