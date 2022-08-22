@@ -89,7 +89,9 @@ class TokenMiddleware(BaseMiddleware):
             if 'club' in handler.__name__:
                 await self.check_club_token(message, user)
                 return
-            await self.check_player_token(message, user)
+            if 'player' in handler.__name__:
+                await self.check_player_token(message, user)
+                return
 
     async def check_player_token(self, message: types.Message, user):
         if user.token is None:
