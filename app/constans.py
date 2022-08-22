@@ -118,3 +118,9 @@ brawlers_dict = {"SHELLY": r'CAACAgIAAxkBAAEFi_di90xHAqUsEsYx3v_02sEGY3hxvAACWRU
                  "BONNIE": r'CAACAgIAAxkBAAEFjHBi91g4gC0BYFWMAtEa5mqVNzpw_AACYR0AAmeF-UuCEqX6uOa7MCkE',
                  "OTIS": r'CAACAgIAAxkBAAEFjHJi91hdJWq1Av0WW-4mFNj_P-CnggACuxoAAg43OUpDZmyEfgOO1ykE'
                  }
+
+sticker_win_rate = {"Best": r'CAACAgIAAxkBAAEFpLpjA6RPo2Fi2c1j_aUdGEP2J3usAgACBBoAAtQY2EqWHjOp_x8M1CkE',
+                    "Good": r'CAACAgIAAxkBAAEFpL5jA6XUxBEtBjt-LOeyK5DsUm4NVgACfhMAAlgt4UrmG0ky34LVuykE',
+                    "Good-middle": r'CAACAgIAAxkBAAEFpMRjA6YtexSjUww3A1qabZqnQmKljQACSxEAAjJZ4EoukCCOLY4-qCkE',
+                    "Middle": r'CAACAgIAAxkBAAEFpMBjA6X-n11NgSu4V_0m2dHLRTn97wACwhEAArQt4ErYR9k8DEYcRCkE',
+                    "Bad": r'CAACAgIAAxkBAAEFpMZjA6Zav6XD5Pcl8n56GMJd8rdtIQACZBIAAh0J4EouyzU5SNpfPikE'}
