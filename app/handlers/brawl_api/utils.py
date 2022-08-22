@@ -176,7 +176,7 @@ async def calculate_percent(stats: Dict, amount: int) -> tuple[int, int, int, st
 
 
 async def send_photo(win_rate: List, message: types.Message) -> None:
-    plt.pie(win_rate, labels=["Win's", "Lose's", "Draw's"])
+    plt.pie(win_rate, labels=["Win's", "Lose's", "Draw's"], autopct='%.3f%%', explode=[0.1, 0.1, 0.1])
     file_temp = uuid.uuid4().hex
     path_to_file = path_temp.joinpath(f"{file_temp}.jpeg")
     plt.savefig(path_to_file, bbox_inches="tight")
