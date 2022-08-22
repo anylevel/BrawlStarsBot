@@ -17,6 +17,8 @@ async def parse_daily_meta(data_events: bytes, class_: str) -> List:
     buttons = list()
     for event in events:
         mode = event.find_previous().get('title')
+        if "GAMEMODES_NAME_HTTPS" in mode:
+            continue
         if 'Duo' in mode:
             continue
         brawl_map = event.get('title')
