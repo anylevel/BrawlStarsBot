@@ -2,7 +2,7 @@ from aiogram import types
 from main import dp
 from app.sessions import Sessions
 from .utils import get_token, get_club_token, session_name_brawl_api, info_club_members, get_player_from_user, \
-    stats_battle_showdown, calculate_percent
+    stats_battle_showdown, calculate_percent, send_photo
 from app.constans import brawlers_dict
 
 
@@ -51,7 +51,9 @@ async def get_player_battle_log(message: types.Message):
                          f"Most used brawler:\n"
                          f"     Name:{most_used_brawler[0].capitalize()}\n"
                          f"     Battle's:{most_used_brawler[1]}\n")
+
     await message.answer_sticker(sticker)
+    await send_photo(win_rate=[percent_wins, percent_draws, percent_loses], message=message)
 
 
 @dp.message_handler(commands=["club_info"])
