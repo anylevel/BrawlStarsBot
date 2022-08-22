@@ -1,7 +1,7 @@
 from typing import Optional
-from app.models import Player
+from app.models import Player, Club
 
-url_brawl_api = 'https://api.brawlstars.com/v1/players/'
+url_brawl_api = ''
 
 
 async def change_battle_log(data: dict, player: Optional[Player]) -> None:
@@ -14,3 +14,14 @@ async def change_battle_log(data: dict, player: Optional[Player]) -> None:
     new_items = [item for item in data["items"] if item not in player.battle_log]
     player.battle_log.extend(new_items)
     await player.save()
+
+
+async def update_player(data: dict, player: Optional[Player]) -> None:
+    player = await player.update_from_dict(
+        {"name": data["name"], "trophies": data["trophies"], "highest_trophies": data["highestTrophies"]})
+    await player.save()
+
+
+async def update_club(data: dict, club: Optional[Club]) -> None:
+    club = await club.update_from_dict({"trophies": data["trophies"]})
+    await club.save()
