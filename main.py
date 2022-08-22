@@ -31,7 +31,7 @@ async def main():
         dp.middleware.setup(ThrottlingMiddleware())
         dp.middleware.setup(TokenMiddleware())
         asyncio.create_task(
-            brawl_schedule(time=1, model=Player, func=change_battle_log, url_model='players', endpoint='battlelog'))
+            brawl_schedule(time=10000, model=Player, func=change_battle_log, url_model='players', endpoint='battlelog'))
         asyncio.create_task(brawl_schedule(time=10000, model=Player, func=update_player, url_model='players'))
         asyncio.create_task(brawl_schedule(time=10000, model=Club, func=update_club, url_model='clubs'))
         await dp.start_polling()
