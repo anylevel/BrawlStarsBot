@@ -1,4 +1,3 @@
-import logging
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiohttp import ClientSession
@@ -14,7 +13,7 @@ import datetime
 
 bot = Bot(token=get_token_bot())
 dp = Dispatcher(bot=bot, storage=MemoryStorage())
-#TODO refactoring
+# TODO refactoring
 handler = AsyncFileHandler(filename="logger.txt")
 logger = Logger.with_default_handlers()
 logger.add_handler(handler=handler)
