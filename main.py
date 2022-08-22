@@ -21,7 +21,7 @@ async def main():
     async with ClientSession(headers=headers_brawl_api) as session_brawl_api, ClientSession(
             headers=headers_brawlify) as session_brawlify:
         from app import dp
-        from app.shedulers.brawl_battlelog import brawl_schedule
+        from app.shedulers.brawl_shedule import brawl_schedule
         from app.shedulers.utils import change_battle_log, update_player, update_club
         Sessions(session=session_brawl_api, name="brawl_api")
         Sessions(session=session_brawlify, name="brawlify")
@@ -31,9 +31,9 @@ async def main():
         dp.middleware.setup(ThrottlingMiddleware())
         dp.middleware.setup(TokenMiddleware())
         asyncio.create_task(
-            brawl_schedule(time=100, model=Player, func=change_battle_log, url_model='players', endpoint='battlelog'))
-        asyncio.create_task(brawl_schedule(time=100, model=Player, func=update_player, url_model='players'))
-        asyncio.create_task(brawl_schedule(time=100, model=Club, func=update_club, url_model='clubs'))
+            brawl_schedule(time=1, model=Player, func=change_battle_log, url_model='players', endpoint='battlelog'))
+        asyncio.create_task(brawl_schedule(time=10000, model=Player, func=update_player, url_model='players'))
+        asyncio.create_task(brawl_schedule(time=10000, model=Club, func=update_club, url_model='clubs'))
         await dp.start_polling()
 
 
