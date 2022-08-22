@@ -1,7 +1,8 @@
 from aiogram import types
 from main import dp
 from app.sessions import Sessions
-from .utils import get_token, get_club_token, session_name_brawl_api, info_club_members
+from .utils import get_token, get_club_token, session_name_brawl_api, info_club_members, get_player_from_user, \
+    stats_battle_showdown, calculate_percent
 from app.constans import brawlers_dict
 
 
@@ -9,7 +10,7 @@ from app.constans import brawlers_dict
 async def get_player_info(message: types.Message):
     token = await get_token(message=message)
     url_get_player_info = f"https://api.brawlstars.com/v1/players/%23{token}/"
-    url_get_brawlers = "https://api.brawlstars.com/v1/brawlers" #TODO refactoring
+    url_get_brawlers = "https://api.brawlstars.com/v1/brawlers"  # TODO refactoring
     async with Sessions.get_response(name=session_name_brawl_api,
                                      url=url_get_player_info) as response_information_player, \
             Sessions.get_response(name=session_name_brawl_api, url=url_get_brawlers) as response_information_brawlers:
@@ -32,6 +33,25 @@ async def get_player_info(message: types.Message):
                          f"{text_brawlers}"
                          )
     await message.answer_sticker(brawlers_dict[top_brawlers[0]['name']])
+
+
+@dp.message_handler(commands=["battle_log"])
+async def get_player_battle_log(message: types.Message):
+    # todo len if
+    player = await get_player_from_user(message=message)
+    battle_log = player.battle_log
+    battles = [battle["battle"] for battle in battle_log]
+    stats, most_used_brawler = await stats_battle_showdown(battles=battles, hashtag=player.token)
+    percent_wins, percent_draws, percent_loses, sticker = await calculate_percent(stats=stats, amount=len(battles))
+    await message.answer(f"Total battle's:{len(battles)}\n"
+                         f"Win rate:\n"
+                         f"     Percent win's:{percent_wins}%\n"
+                         f"     Percent draw's:{percent_draws}%\n"
+                         f"     Percent lose's:{percent_loses}%\n"
+                         f"Most used brawler:\n"
+                         f"     Name:{most_used_brawler[0].capitalize()}\n"
+                         f"     Battle's:{most_used_brawler[1]}\n")
+    await message.answer_sticker(sticker)
 
 
 @dp.message_handler(commands=["club_info"])
