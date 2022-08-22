@@ -1,7 +1,7 @@
 from aiogram import types
 from main import dp
 from app.sessions import Sessions
-from .utils import get_token, get_clan_token, session_name_brawl_api, info_clan_members
+from .utils import get_token, get_club_token, session_name_brawl_api, info_club_members
 from app.constans import brawlers_dict
 
 
@@ -9,7 +9,7 @@ from app.constans import brawlers_dict
 async def get_player_info(message: types.Message):
     token = await get_token(message=message)
     url_get_player_info = f"https://api.brawlstars.com/v1/players/%23{token}/"
-    url_get_brawlers = "https://api.brawlstars.com/v1/brawlers"
+    url_get_brawlers = "https://api.brawlstars.com/v1/brawlers" #TODO refactoring
     async with Sessions.get_response(name=session_name_brawl_api,
                                      url=url_get_player_info) as response_information_player, \
             Sessions.get_response(name=session_name_brawl_api, url=url_get_brawlers) as response_information_brawlers:
@@ -34,15 +34,15 @@ async def get_player_info(message: types.Message):
     await message.answer_sticker(brawlers_dict[top_brawlers[0]['name']])
 
 
-@dp.message_handler(commands=["clan_info"])
-async def get_clan_info(message: types.Message):
-    clan_token = await get_clan_token(message=message)
-    url_get_clan_info = f"https://api.brawlstars.com/v1/clubs/%23{clan_token}/"
-    async with Sessions.get_response(name=session_name_brawl_api, url=url_get_clan_info) as response_clan_info:
-        data = await response_clan_info.json()
-    president, members_role = await info_clan_members(members=data["members"])
+@dp.message_handler(commands=["club_info"])
+async def get_club_info(message: types.Message):
+    club_token = await get_club_token(message=message)
+    url_get_club_info = f"https://api.brawlstars.com/v1/clubs/%23{club_token}/"
+    async with Sessions.get_response(name=session_name_brawl_api, url=url_get_club_info) as response_club_info:
+        data = await response_club_info.json()
+    president, members_role = await info_club_members(members=data["members"])
     top_players = data["members"][:5]
-    await message.answer(f"Clan name:{data['name']}\n"
+    await message.answer(f"Club name:{data['name']}\n"
                          f"type:{data['type']}\n"
                          f"Required trophies:{data['requiredTrophies']}\n"
                          f"Trophies:{data['trophies']}\n"
@@ -63,7 +63,7 @@ async def get_clan_info(message: types.Message):
                 Trophies:{top_player['trophies']}                        
                         """
 
-    await message.answer(f"Top 5 players of the clan:\n"
+    await message.answer(f"Top 5 players of the club:\n"
                          f"{text_players}")
 
 # TODO Сделать команду battlelog которая будет подсчитывать стату делать диаграммы и угарные смайлы типа мегахорош

@@ -40,7 +40,7 @@ stickers_top_players = [r'CAACAgIAAxkBAAEFkfVi-r-kGtL6Iq7sPeOk9IFl0CMoqQACJw8AAj
                         r'CAACAgIAAxkBAAEFkgFi-r_d90-fUXc4OotnfV_h1YsgCQACagwAAnTNCEt2YmvpJSk7dikE',
                         r'CAACAgIAAxkBAAEFkgNi-r_hghtysNq64_TeVSYa-IBeMAACWAwAAvF-CUsWv4wpzmPG0ikE',
                         r'CAACAgIAAxkBAAEFkgVi-r_oIBne94vEggpNf3V669TqOAACBBoAAtQY2EqWHjOp_x8M1CkE']
-stickers_top_clans = [r'CAACAgIAAxkBAAEFknxi-tI82kzxOqHorfMaMr1ZUzoajgACxAADw7nhMEkFxGPj2hD6KQQ',
+stickers_top_clubs = [r'CAACAgIAAxkBAAEFknxi-tI82kzxOqHorfMaMr1ZUzoajgACxAADw7nhMEkFxGPj2hD6KQQ',
                       r'CAACAgIAAxkBAAEFkn5i-tI-g22cisaYNv1LAAEu_6ApQz0AAsYAA8O54TB6p5PcyWybCikE',
                       r'CAACAgIAAxkBAAEFkoBi-tJA84OyvKaQSewaz3IPCgjFFAACxQADw7nhMIVlVMiGK9G0KQQ',
                       r'CAACAgIAAxkBAAEFkoJi-tJBonGdYfCcoLERPnPWnEmpfQACwQADw7nhMBlEIRYGJTCHKQQ',

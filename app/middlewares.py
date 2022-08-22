@@ -86,8 +86,8 @@ class TokenMiddleware(BaseMiddleware):
                 await message.answer_sticker(
                     r'CAACAgIAAxkBAAEFjIVi91yAp_UKubzoOiiidvfimaLx9QAC8gwAAuiJCUtb2eA7d4pURikE')
                 raise CancelHandler()
-            if 'clan' in handler.__name__:
-                await self.check_clan_token(message, user)
+            if 'club' in handler.__name__:
+                await self.check_club_token(message, user)
                 return
             await self.check_player_token(message, user)
 
@@ -97,8 +97,8 @@ class TokenMiddleware(BaseMiddleware):
             await message.answer_sticker(r'CAACAgIAAxkBAAEFjIdi91ytINW8O-rEkHWUNejnQvtr3wAC4wwAAtQbAUun32PY5_JyhSkE')
             raise CancelHandler()
 
-    async def check_clan_token(self, message: types.Message, user):
-        if user.clan_token is None:
-            await message.answer(f"Токен отсутствует, пожалуйста запустите команду:\n /add_clan")
+    async def check_club_token(self, message: types.Message, user):
+        if user.club_token is None:
+            await message.answer(f"Токен отсутствует, пожалуйста запустите команду:\n /add_club")
             await message.answer_sticker(r'CAACAgIAAxkBAAEFjIdi91ytINW8O-rEkHWUNejnQvtr3wAC4wwAAtQbAUun32PY5_JyhSkE')
             raise CancelHandler()

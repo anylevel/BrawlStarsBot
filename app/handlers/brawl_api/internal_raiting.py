@@ -1,8 +1,8 @@
 from aiogram import types
-from app.models import Player, Clan
+from app.models import Player, Club
 from main import dp
-from .utils import get_player_from_user, get_clan_from_user
-from app.constans import places, sticker_trophies, stickers_top_players, stickers_top_clans
+from .utils import get_player_from_user, get_club_from_user
+from app.constans import places, sticker_trophies, stickers_top_players, stickers_top_clubs
 import random
 
 
@@ -27,22 +27,22 @@ async def internal_player_rating(message: types.Message):
     await message.answer_sticker(sticker)
 
 
-@dp.message_handler(commands=["clan_rating"])
-async def internal_clan_rating(message: types.Message):
-    current_clan = await get_clan_from_user(message=message)
-    clans_count = await Clan.all().count()
-    clans = await Clan.all()
-    top_clans = clans[:3]
-    result_answer = 'Top 3 clans:\n'
-    for count, clan in enumerate(top_clans, start=1):
-        result_answer += f'{count}.{clan}\n'
-    if current_clan in top_clans:
-        place = top_clans.index(current_clan) + 1
-        result_answer += f"Congratulations! Your clan ranked {place}{places[str(place)]} place out of {clans_count}"
-        sticker = random.choice(stickers_top_clans)
+@dp.message_handler(commands=["club_rating"])
+async def internal_club_rating(message: types.Message):
+    current_club = await get_club_from_user(message=message)
+    clubs_count = await Club.all().count()
+    clubs = await Club.all()
+    top_clubs = clubs[:3]
+    result_answer = 'Top 3 clubs:\n'
+    for count, club in enumerate(top_clubs, start=1):
+        result_answer += f'{count}.{club}\n'
+    if current_club in top_clubs:
+        place = top_clubs.index(current_club) + 1
+        result_answer += f"Congratulations! Your club ranked {place}{places[str(place)]} place out of {clubs_count}"
+        sticker = random.choice(stickers_top_clubs)
     else:
-        place = clans.index(current_clan) + 1
-        result_answer += f"Wow! Your clan ranked {place}{places[str(place)[-1]]} out of {clans_count}"
+        place = clubs.index(current_club) + 1
+        result_answer += f"Wow! Your club ranked {place}{places[str(place)[-1]]} out of {clubs_count}"
         sticker = random.choice(sticker_trophies)
     await message.answer(result_answer)
     await message.answer_sticker(sticker)

@@ -1,5 +1,5 @@
 from app.sessions import Sessions
-from app.models import User, Player, Clan
+from app.models import User, Player, Club
 from aiogram import types
 from typing import Any, Dict, List, Tuple
 from collections import Counter
@@ -24,7 +24,7 @@ async def hashtag_check(hashtag: str) -> tuple[str, bool, Any]:
     return hashtag, True, data
 
 
-async def hashtag_clan_check(hashtag: str) -> tuple[str, bool, Any]:
+async def hashtag_club_check(hashtag: str) -> tuple[str, bool, Any]:
     hashtag = await general_hashtag_check(hashtag=hashtag)
     url = f"https://api.brawlstars.com/v1/clubs/%23{hashtag}/"
     async with Sessions.get_response(name=session_name_brawl_api, url=url) as response:
@@ -39,9 +39,9 @@ async def get_token(message: types.Message):
     return user.token
 
 
-async def get_clan_token(message: types.Message):
+async def get_club_token(message: types.Message):
     user = await User.get(name=message.from_user.username)
-    return user.clan_token
+    return user.club_token
 
 
 async def get_player_from_user(message: types.Message):
@@ -49,12 +49,12 @@ async def get_player_from_user(message: types.Message):
     return player
 
 
-async def get_clan_from_user(message: types.Message):
-    clan = await Clan.get(token=await get_clan_token(message=message))
+async def get_club_from_user(message: types.Message):
+    clan = await Club.get(token=await get_club_token(message=message))
     return clan
 
 
-async def info_clan_members(members: List) -> Tuple[Dict, Dict]:
+async def info_club_members(members: List) -> Tuple[Dict, Dict]:
     members_role = Counter([member["role"] for member in members])
     for member in members:
         if member["role"] == "president":
