@@ -39,8 +39,10 @@ async def get_player_info(message: types.Message):
 async def get_player_battle_log(message: types.Message):
     # todo len if
     player = await get_player_from_user(message=message)
-    battle_log = player.battle_log
-    battles = [battle["battle"] for battle in battle_log]
+    if not player.battle_log:
+        await message.answer("At the moment you can not look at the statistics look and come back!")
+        await message.answer_sticker(r'CAACAgIAAxkBAAEFpiFjBIuOa_4FYDc5vT8D1m7wSsT1gQAC-goAAi1oCEuqU9yIn_h9FSkE')
+    battles = [battle["battle"] for battle in player.battle_log]
     stats, most_used_brawler = await stats_battle_showdown(battles=battles, hashtag=player.token)
     percent_wins, percent_draws, percent_loses, sticker = await calculate_percent(stats=stats, amount=len(battles))
     await message.answer(f"Total battle's:{len(battles)}\n"
