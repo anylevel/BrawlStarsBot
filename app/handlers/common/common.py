@@ -160,6 +160,18 @@ async def information_about_project(message: types.Message):
     await message.answer_sticker(r'CAACAgIAAxkBAAEFi95i9vY_P76wYjE3I3w6thQfjOUgIAACtwADw7nhMB8bl05QzRNTKQQ')
 
 
+@dp.message_handler(commands=['current'])
+async def current_condition(message: types.Message):
+    user = await User.get_or_none(name=message.from_user.username)
+    await check_user(user=user, message=message)
+    if not user.token:
+        user.token = 'Missing'
+    if not user.club_token:
+        user.club_token = 'Missing'
+    await message.answer(f"Token player:{user.token}\nToken club:{user.club_token}")
+    await message.answer_sticker(r'CAACAgIAAxkBAAEFpiVjBI15PXOBWSJhlh4e2lryWSGcCwAC2xcAAjbTkUhKz6LaFzZQPykE')
+
+
 @dp.message_handler(content_types=ContentType.ANY)
 async def action_without_command(message: types.Message):
     await message.answer("Я понимаю только команды которые придумал мой создатель!")
